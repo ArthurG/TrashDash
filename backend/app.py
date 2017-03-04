@@ -1,4 +1,5 @@
 import keys 
+import utils
 
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
@@ -9,11 +10,12 @@ from clarifai.rest import ClarifaiApp
 import traceback
 import requests
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
+CORS(app)
 
 #Models
 class User(db.Model):
@@ -65,6 +67,89 @@ model_food = clarifai.models.get("food-items-v1.0")
 def hello_world():
     return 'Hello, World!'
 
+@app.route('/<user_id>/spending_summary/', methods=['GET'])
+def spending(user_id):
+    week_since = datetime.utcnow()-timedelta(hours = 7*24)
+    month_since = datetime.utcnow()-timedelta(hours = 30*24)
+    day_since = datetime.utcnow()-timedelta(hours = 1*24)
+
+    m = {"weekly": get_total_waste_since(user_id, week_since), "monthly": get_total_waste_since(user_id, month_since), "daily": get_total_waste_since(user_id, day_since)}
+
+    spendingsPerDay = []
+    for i in range(30):
+        later = datetime.utcnow() - timedelta(hours = 24*i)
+        earlier = datetime.utcnow() - timedelta(hours = 24*(i+1))
+        allSpending = DisposalTransaction.query.filter(DisposalTransaction.user_id==user_id).filter(DisposalTransaction.datetime>=earlier).filter(DisposalTransaction.datetime<=later).all()
+        s = sum([s.value for s in allSpending])
+        spendingsPerDay.append(s)
+    m["per_day"] = spendingsPerDay
+    m["days"] = [str((datetime.utcnow()-timedelta(hours  = 24 * i)).date()) for i in range(30)]
+
+    return json.dumps(m), 200
+
+def get_total_waste_since(u_id, since):
+    transactions = DisposalTransaction.query.filter(DisposalTransaction.user_id==u_id).filter(DisposalTransaction.datetime>=since).all()
+    totals = sum([transaction.value for transaction in transactions])
+    return totals
+
+@app.route('/<user_id>/transactions/', methods=['GET'])
+def transactions(user_id):
+    allSpending = DisposalTransaction.query.filter(DisposalTransaction.user_id==user_id).all()
+    a = [{"amount": s.value, "date": str(s.datetime), "category": s.category} for s in allSpending]
+    return json.dumps({"transactions": a}), 200
+
+
+@app.route('/<user_id>/category/<duration>', methods=['GET'])
+def categories(user_id, duration):
+    if duration not in ["week", "month", "day"]:
+        duration = "day"
+        print("You entered an invalid duration, setting to day")
+    since = datetime.utcnow()-timedelta(hours = 1*24)
+    if duration == "day":
+        since = datetime.utcnow()-timedelta(hours = 1*24)
+    if duration == "month":
+        since = datetime.utcnow()-timedelta(hours = 30*24)
+    if duration == "week":
+        since = datetime.utcnow()-timedelta(hours = 7*24)
+    unique_categories =DisposalTransaction.query.filter(DisposalTransaction.user_id==user_id).filter(DisposalTransaction.datetime>=since).distinct(DisposalTransaction.category).all()
+
+    m = {}
+    for item in unique_categories:
+        cat = item.category
+        items =DisposalTransaction.query.filter(DisposalTransaction.user_id==user_id).filter(DisposalTransaction.datetime>=since).filter(DisposalTransaction.category == cat).all()
+        spending_sum = sum([item.value for item in items])
+        m[cat] = spending_sum
+
+    return json.dumps(m), 200
+
+@app.route('/<user_id>/friends/<friend_name>', methods=['POST'])
+def add_friend(user_id, friend_name):
+    self = User.query.filter_by(id=user_id).first_or_404()
+    friend = User.query.filter_by(facebook_name=friend_name).first_or_404()
+
+    hasRelationship = Friendship.query.filter(Friendship.user_follower_id==self.id).filter(Friendship.user_followed_id==friend.id).all()
+    if len(hasRelationship)>0:
+        return "Already exists", 400
+    relationship = Friendship(self, friend)
+    db.session.add(relationship)
+    db.session.commit()
+    return "ok", 200
+
+@app.route('/<user_id>/friends', methods=['GET'])
+def get_friends(user_id):
+    self = User.query.filter_by(id=user_id).first_or_404()
+    friendships = Friendship.query.filter_by(user_follower_id=user_id).all()
+    since = datetime.utcnow() - timedelta(hours=24)
+    spendingToday = get_total_waste_since(user_id, since)
+    friends = []
+    for f in friendships:
+        f_id = f.user_followed_id
+        friendTransactionsToday = get_total_waste_since(f_id, since)
+        name = User.query.filter_by(id=f_id).first_or_404().fb_name
+        friends.append({"name": name, "spendings": friendTransactionsToday, "mineIsGreater": friendTransactionsToday < spendingToday})
+
+    return json.dumps({"friends": friends}), 200
+
 
 @app.route('/webhook', methods=['GET'])
 def verify():
@@ -99,7 +184,7 @@ def process_webhook():
                         process_string_message(messaging_event)
                     #Process image => sticker
                     elif messaging_event["message"].get("attachments", [])[0].get("type", "") == "image" and messaging_event["message"].get("attachments", [])[0].get("payload", {}).get("sticker_id", False):
-                        send_message(messaging_event["sender"]["id"], "Pls no stickers. My master didn't teach me to handle 'em")
+                        utils.send_message(messaging_event["sender"]["id"], "Pls no stickers. My master didn't teach me to handle 'em")
                         #Process image => not sticker
                     elif messaging_event["message"].get("attachments", [])[0].get("type", "") == "image":
                         process_image(messaging_event)
@@ -145,7 +230,7 @@ def process_image(messaging_event):
         value = get_food_price(product_type)
         print(json.dumps(food_ans, indent=4))
 
-    send_message(messaging_event["sender"]["id"], "You sent me {} and I think it is worth {}".format(product_type, value))
+    utils.send_message(messaging_event["sender"]["id"], "You sent me {} and I think it is worth {}".format(product_type, value))
     save_trash_to_database(user, product_type, value)
 
 
@@ -154,20 +239,20 @@ def process_image(messaging_event):
             suggest_kijiji(messaging_event)
         else:
             m = {"message": "That looks valuable, you might want to list that on Kijiji...", "replies": [{"msg": "Yes", "payload": "YESLIST"},{"msg": "No", "payload": "NOLIST"}]}
-            send_message_quick_reply(user.fb_id, m)
+            utils.send_message_quick_reply(user.fb_id, m)
     else:
-        send_message(user.fb_id, "Waste is now saved")
+        utils.send_message(user.fb_id, "Waste is now saved")
 
 def get_user_or_signup(messaging_event):
     user = User.query.filter_by(fb_id=messaging_event["sender"]["id"]).first()
     if user == None:
         #TODO: get the user's facebook name too
         uid = messaging_event["sender"]["id"]
-        name = get_user_full_name(uid)
+        name = utils.get_user_full_name(uid)
         user = User(uid, name)
         db.session.add(user)
         db.session.commit()
-        send_message(user.fb_id, "Thank you for signing up! You can now start sending me pictures of your trash")
+        utils.send_message(user.fb_id, "Thank you for signing up! You can now start sending me pictures of your trash")
     return user
 
 def process_quick_reply(messaging_event):
@@ -189,100 +274,27 @@ def process_string_message(messaging_event):
         user.kijiji_email = message
         user.command_in_progress = "kijiji_password"
         db.session.commit()
-        send_message(user.fb_id, "And your Kijiji password is?")
+        utils.send_message(user.fb_id, "And your Kijiji password is?")
         return
     elif past_state == "kijiji_password":
         user.command_in_progress = ""
         user.kijiji_password = message
         db.session.commit()
-        send_message(user.fb_id, "Done! Your Kijiji info is saved. You will now be prompted to list expensive products on Kijiji")
+        utils.send_message(user.fb_id, "Done! Your Kijiji info is saved. You will now be prompted to list expensive products on Kijiji")
         return
     elif message == "Link Kijiji":
-        send_message(user.fb_id, "What is your kijiji email?")
+        utils.send_message(user.fb_id, "What is your kijiji email?")
         user.command_in_progress = "kijiji_username"
         db.session.commit()
         return
 
     #Retriving status Web UI links
     elif message == "Dashboard":
-        send_dashboard_link(user)
+        utils.send_dashboard_link(user)
     #Branch for processing quick requests ie: summaryToday, etc
 
 def process_wish_to_post(user):
     #if user.disposals[-1].wishtopost:
         #kijiji_post(item)
     return 
-
-def send_dashboard_link(user):
-    msg = {
-        "attachment":{
-          "type":"template",
-          "payload":{
-            "template_type":"generic",
-            "elements":[
-               {
-                "title":"Welcome to your Trash Dash(board)",
-                "image_url":"https://d13yacurqjgara.cloudfront.net/users/15720/screenshots/989123/chartjs.png",
-                "subtitle":"Making you less waste, one product at a time",
-                "buttons": [
-                    {
-                      "type": "web_url",
-                      "url": "http://localhost:8080/uid={}".format(user.id),
-                      "title": "View",
-                    }
-                ],
-              }
-            ]
-          }
-        }
-    }
-    #send_message(user.fb_id, "http://localhost:3000/uid={}".format(user.id))
-    send_message_raw(json.dumps({"recipient": {"id": user.fb_id},"message": msg}))
-
-
-def send_message(recipient, text):
-    data = json.dumps({
-    "recipient": {
-        "id": recipient
-        },
-    "message": {
-
-        "text": text,
-
-        }
-    })
-    send_message_raw(data)
-
-def send_message_quick_reply(recipient, data):
-    msg = data["message"]
-    replies = data["replies"]
-    quick_replies = [{"content_type": "text", "title": reply["msg"], "payload": reply["payload"]} for reply in replies]
-    content = json.dumps({"recipient": {"id": recipient},
-           "message": {
-               "text": msg,
-               "quick_replies": quick_replies
-               }
-           })
-    send_message_raw(content)
-
-def send_message_raw(data):
-    params = {
-        "access_token": keys.ACCESS_TOKEN
-        }
-    headers = {
-        "Content-Type": "application/json"
-        }
-    r = requests.post("https://graph.facebook.com/v2.6/me/messages", params=params, headers=headers, data=data)
-    if r.status_code != 200:
-        print(r.status_code)
-        print(r.text)
-
-def get_user_full_name(uid):
-    url = "https://graph.facebook.com/v2.6/1314551495274556?fields=first_name,last_name,profile_pic,locale,timezone,gender&access_token="+keys.ACCESS_TOKEN
-    r = requests.get(url)
-    response = r.json()
-    if r.status_code != 200:
-        print(r.status_code)
-        print(r.text)
-    return response["first_name"] + " " + response["last_name"]
 
