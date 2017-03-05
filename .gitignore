@@ -93,5 +93,6 @@ ENV/
 
 frontend/node_modules/
 backend/test.db
+backend/keys.py
 .gitignore
 *.swo
