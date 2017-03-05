@@ -18,7 +18,7 @@ def send_dashboard_link(user):
                 "buttons": [
                     {
                       "type": "web_url",
-                      "url": "http://localhost:8080/#/dashboard/{}".format(user.id),
+                      "url": "https://707a979a.ngrok.io/#/dashboard/{}".format(user.id),
                       "title": "View",
                     }
                 ],

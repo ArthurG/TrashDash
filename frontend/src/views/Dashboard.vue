@@ -184,7 +184,7 @@ export default {
  
     getData(){
     //Get spending summary
-    this.$http.get('http://localhost:5000/'+this.uid+'/spending_summary/').then(response => {
+    this.$http.get(this.uid+'/spending_summary/').then(response => {
       this.stats.monthly = response.body.monthly;
     this.stats.daily = response.body.daily;
     this.stats.weekly = response.body.weekly;
@@ -210,7 +210,7 @@ export default {
     });
 
     //Get the spending categories
-    this.$http.get('http://localhost:5000/'+this.uid+'/category/week').then(response => {
+    this.$http.get(this.uid+'/category/week').then(response => {
       this.pie_data = {
         labels: Object.keys(response.body),
         datasets: [
@@ -232,7 +232,7 @@ export default {
     }, err => {});
 
     //Get your friends data
-    this.$http.get('http://localhost:5000/'+this.uid+'/friends').then(response => {
+    this.$http.get(this.uid+'/friends').then(response => {
       this.friend_data = response.body.friends
     }, err => {});
 

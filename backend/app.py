@@ -1,7 +1,7 @@
 import keys 
 import utils
 
-from flask import Flask, request
+from flask import Flask, request, current_app, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 
@@ -13,7 +13,7 @@ import json
 from datetime import datetime, timedelta
 import kijiji
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 db = SQLAlchemy(app)
 CORS(app)
@@ -65,7 +65,24 @@ model_food = clarifai.models.get("food-items-v1.0")
 
 @app.route('/')
 def hello_world():
-    return 'Hello, World!'
+    ##return 'Hello, World!'
+    return app.send_static_file('index.html')
+
+#@app.route('/js/<path:path>')
+#def send_js(path):
+#    return send_from_directory('js', path)
+
+#@app.route('/css/<path:path>')
+#def send_css(path):
+#    return send_from_directory('css', path)
+
+#@app.route('/fonts/<path:path>')
+#def send_font(path):
+#    return send_from_directory('fonts', path)
+
+#@app.route('/img/<path:path>')
+#def send_img(path):
+#    return send_from_directory('img', path)
 
 @app.route('/<user_id>/spending_summary/', methods=['GET'])
 def spending(user_id):
