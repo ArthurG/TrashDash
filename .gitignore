@@ -87,3 +87,12 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+.DS_Store
+.*swp
+
+frontend/node_modules/
+backend/test.db
+backend/keys.py
+.gitignore
+*.swo
