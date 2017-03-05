@@ -15253,7 +15253,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card-block pb-0"
   }, [_c('h4', {
     staticClass: "mb-0"
-  }, [_vm._v(_vm._s(_vm.stats.daily))]), _vm._v(" "), _c('p', [_vm._v("Daily Spending")])]), _vm._v(" "), _c('div', {
+  }, [_vm._v(_vm._s(_vm.stats.daily))]), _vm._v(" "), _c('p', [_vm._v("Daily Waste Produced")])]), _vm._v(" "), _c('div', {
     staticClass: "chart-wrapper px-1",
     staticStyle: {
       "height": "70px"
@@ -15273,7 +15273,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card-block pb-0"
   }, [_c('h4', {
     staticClass: "mb-0"
-  }, [_vm._v(_vm._s(_vm.stats.weekly))]), _vm._v(" "), _c('p', [_vm._v("Weekly Spending")])]), _vm._v(" "), _c('div', {
+  }, [_vm._v(_vm._s(_vm.stats.weekly))]), _vm._v(" "), _c('p', [_vm._v("Weekly Waste Produced")])]), _vm._v(" "), _c('div', {
     staticClass: "chart-wrapper px-1",
     staticStyle: {
       "height": "70px"
@@ -15293,7 +15293,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card-block pb-0"
   }, [_c('h4', {
     staticClass: "mb-0"
-  }, [_vm._v(_vm._s(_vm.stats.monthly))]), _vm._v(" "), _c('p', [_vm._v("Monthly Spending")])]), _vm._v(" "), _c('div', {
+  }, [_vm._v(_vm._s(_vm.stats.monthly))]), _vm._v(" "), _c('p', [_vm._v("Monthly Waste Produced")])]), _vm._v(" "), _c('div', {
     staticClass: "chart-wrapper",
     staticStyle: {
       "height": "70px"
@@ -15326,7 +15326,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "card"
   }, [_c('div', {
     staticClass: "card-header"
-  }, [_vm._v("\n          Spending by Category\n        ")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("\n          Waste by Category\n        ")]), _vm._v(" "), _c('div', {
     staticClass: "card-block"
   }, [_c('div', {
     staticClass: "row"
@@ -15358,7 +15358,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "col-sm-5"
   }, [_c('h4', {
     staticClass: "card-title mb-0"
-  }, [_vm._v("Spending last month")]), _vm._v(" "), _c('div', {
+  }, [_vm._v("Your Waste Last Month")]), _vm._v(" "), _c('div', {
     staticClass: "small text-muted"
   }, [_vm._v("Breakdown by day")])])])
 },function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -24652,4 +24652,4 @@ new __WEBPACK_IMPORTED_MODULE_0_vue___default.a({
 
 /***/ })
 ]),[506]);
-//# sourceMappingURL=app.e71e9a86453f02b9ecbd.js.map
+//# sourceMappingURL=app.30e7bad1ef79065ed5df.js.map

@@ -5,7 +5,7 @@
         <div class="card card-inverse card-primary" v-on:click="getData">
           <div class="card-block pb-0">
             <h4 class="mb-0">{{stats.daily}}</h4>
-            <p>Daily Spending</p>
+            <p>Daily Waste Produced</p>
           </div>
           <div class="chart-wrapper px-1" style="height:70px;">
             <card-line1-chart-example height="70"/>
@@ -17,7 +17,7 @@
         <div class="card card-inverse card-danger" v-on:click="getData">
           <div class="card-block pb-0">
             <h4 class="mb-0">{{stats.weekly}}</h4>
-            <p>Weekly Spending</p>
+            <p>Weekly Waste Produced</p>
           </div>
           <div class="chart-wrapper px-1" style="height:70px;">
             <card-bar-chart-example height="70"/>
@@ -29,7 +29,7 @@
         <div class="card card-inverse card-warning" v-on:click="getData">
           <div class="card-block pb-0">
             <h4 class="mb-0">{{stats.monthly}}</h4>
-            <p>Monthly Spending</p>
+            <p>Monthly Waste Produced</p>
           </div>
           <div class="chart-wrapper" style="height:70px;">
             <card-line3-chart-example height="70"/>
@@ -43,7 +43,7 @@
       <div class="card-block">
         <div class="row">
           <div class="col-sm-5">
-            <h4 class="card-title mb-0">Spending last month</h4>
+            <h4 class="card-title mb-0">Your Waste Last Month</h4>
             <div class="small text-muted">Breakdown by day</div>
           </div><!--/.col-->
         </div><!--/.row-->
@@ -57,7 +57,7 @@
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            Spending by Category
+            Waste by Category
           </div>
           <div class="card-block">
             <div class="row">
