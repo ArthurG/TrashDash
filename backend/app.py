@@ -11,6 +11,7 @@ import traceback
 import requests
 import json
 from datetime import datetime, timedelta
+import kijiji
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
@@ -187,7 +188,6 @@ def process_webhook():
                         #Process image => not sticker
                     elif messaging_event["message"].get("attachments", [])[0].get("type", "") == "image":
                         process_image(messaging_event)
-                    #Process location requests TODO
                     elif messaging_event["message"].get("attachments", [])[0].get("type", "") == "location":
                         process_location(messaging_event)
                 except:
@@ -211,7 +211,9 @@ def get_food_type(concepts):
             return concept["name"]
 
 def suggest_kijiji(messaging_event):
-    return ""
+    user = get_user_or_signup(messaging_event)
+    m = {"message": "That looks valuable, you might want to list that on Kijiji...", "replies": [{"msg": "List Now", "payload": "LISTNOW"},{"msg": "No", "payload": "NOLIST"}]}
+    utils.send_message_quick_reply(user.fb_id, m)
 
 def save_trash_to_database(user, product_type, value):
     product = DisposalTransaction(user, value, product_type)
@@ -239,10 +241,13 @@ def process_image(messaging_event):
         if (user.kijiji_email != "" and user.kijiji_email) and (user.kijiji_password and user.kijiji_password != ""):
             suggest_kijiji(messaging_event)
         else:
-            m = {"message": "That looks valuable, you might want to list that on Kijiji...", "replies": [{"msg": "Yes", "payload": "YESLIST"},{"msg": "No", "payload": "NOLIST"}]}
-            utils.send_message_quick_reply(user.fb_id, m)
+            suggest_kijiji_link(messaging_event)
     else:
         utils.send_message(user.fb_id, "Waste is now saved")
+
+def suggest_kijiji_link(messaging_event):
+    m = {"message": "That looks valuable, you might want to list that on Kijiji...", "replies": [{"msg": "Link my account", "payload": "YESLIST"},{"msg": "No", "payload": "NOLIST"}]}
+    utils.send_message_quick_reply(user.fb_id, m)
 
 def get_user_or_signup(messaging_event):
     user = User.query.filter_by(fb_id=messaging_event["sender"]["id"]).first()
@@ -264,12 +269,20 @@ def process_quick_reply(messaging_event):
         disposal = user.disposals[-1]
         disposal.wishtopost = True
         db.session.commit()
+    elif quick_reply_payload == "LISTNOW":
+        user = User.query.filter_by(fb_id=messaging_event["sender"]["id"]).first()
+        disposal = user.disposals[-1]
+        disposal.wishtopost = True
+        db.session.commit()
+        process_wish_to_post(messaging_event)
+
+
 
 def process_string_message(messaging_event):
     user = get_user_or_signup(messaging_event)
     message = messaging_event["message"]["text"]
     past_state = user.command_in_progress
-        ##Kijiji type actions
+    ##Kijiji account administration type actions
     if past_state == "kijiji_username":
         user.kijiji_email = message
         user.command_in_progress = "kijiji_password"
@@ -287,6 +300,21 @@ def process_string_message(messaging_event):
         user.command_in_progress = "kijiji_username"
         db.session.commit()
         return
+    #Listing products on Kijiji
+    elif "kijiji_list" in past_state:
+        item_id = past_state.strip("kijiji_list_")
+        item = DisposalTransaction.query.filter(DisposalTransaction.id==item_id).first()
+        title, description, price = message.split(",")
+        utils.send_message(user.fb_id, "I will try to list that for you...")
+        k = kijiji.KijijiApi()
+        k.login(user.kijiji_email, user.kijiji_password)
+        k.postAdUsingData(utils.get_kijiji_data(title, description, price, item.itemname))
+        DisposalTransaction.query.filter(DisposalTransaction.id==item_id).delete()
+        user.command_in_progress = ""
+        db.session.commit()
+        utils.send_message(user.fb_id, "Successfully listed")
+        
+    #Processing in-store transactions
     elif "looking to buy" in message:
         msg = message.split("looking to buy")
         category = utils.get_product_category(msg[-1].strip())
@@ -316,21 +344,17 @@ def process_location(messaging_event):
         transactions = DisposalTransaction.query.filter(DisposalTransaction.user_id==user.id).filter(DisposalTransaction.category!="electronics").filter(DisposalTransaction.datetime >=after_time).all()
         cats = {}
         for t in transactions:
-            print(t.category, cats.get(t.category,0)+t.value)
             cats.update({t.category: cats.get(t.category, 0)+t.value}) 
         catsList = sorted(cats.items(), key = lambda c: c[1], reverse=True)
         top3Cats = catsList[:min(len(catsList), 3)]
         utils.send_message(user.fb_id, "During the next grocery trip, consider your top three waste categories in your last month")
         [utils.send_message(user.fb_id, "{}: ${}".format(c[0], c[1])) for c in top3Cats]
 
-
-        
-
-
-
-
-def process_wish_to_post(user):
-    #if user.disposals[-1].wishtopost:
-        #kijiji_post(item)
-    return 
+def process_wish_to_post(messaging_event):
+    user = get_user_or_signup(messaging_event)
+    if user.disposals[-1].wishtopost:
+        item_to_post = user.disposals[-1]
+        user.command_in_progress="kijiji_list_{}".format(item_to_post.id)
+        db.session.commit()
+        utils.send_message(user.fb_id, "Can you give me the title, description, and price of your {} for your Kijiji ad?".format(item_to_post.itemname))
 

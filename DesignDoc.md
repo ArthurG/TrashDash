@@ -13,7 +13,7 @@
 ### Should haves
 
 * Facebook bot should attempt to minimze amount of clicks required for must haves ( good UX )
-* Facebook bot should assist user in posting old trash to Kijiji if its value is high
+* ~~Facebook bot should assist user in posting old trash to Kijiji if its value is high~~
 * ~~Facebook bot should be able to show relevant trash history if user sends location which is near a store~~
 * Web UI should be able to add friends on social network, and compete to minimize the amount of trash they dispose
 * ~~There should be a way to link Kijiji Accounts to your TrashWatch profile~~

@@ -97,3 +97,15 @@ def is_near_store(lat, lng, category="store",keyword="grocery",radius=100):
     r = requests.get(endpoint, params=params)
     return len(r.json()["results"]) > 0
     
+def get_kijiji_data(title, description, price, product_name):
+    m = {"postAdForm.attributeMap[forsaleby_s]": "ownr", "postAdForm.priceAmount": price,"postAdForm.priceType": "FIXED", "featuresForm.topAdDuration": "7", "postAdForm.title": title, "postAdForm.locationId": "1700212", "postAdForm.city": "Waterloo", "postAdForm.province": "ON", "postAdForm.description": description, "submitType": "saveAndCheckout", "locationLevel0": "1700209", "postAdForm.geocodeLng": "-80.5980028", "postAdForm.postalCode": "N2V 2W6", "postAdForm.adType": "OFFER", "postAdForm.geocodeLat": "43.472549", "PostalLng": "-80.5980028", "PostalLat": "43.472549"} 
+    if product_name == "laptop":
+        m["postAdForm.attributeMap[laptopscreensize_s]"] = "laptopunder14inch"
+        m["postAdForm.attributeMap[laptopbrand_s]"] = "laptoplenovo"
+        m["categoryId"] = "773"
+    elif product_name == "iphone" or product_name == "phone":
+        m["categoryId"] = "760"
+        m["postAdForm.attributeMap[phonebrand_s]"]="apple"
+        m["postAdForm.attributeMap[phonecarrier_s]"]="other"
+    print(m)
+    return m
