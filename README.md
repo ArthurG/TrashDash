@@ -1,4 +1,4 @@
-#TrashWatch
+#TrashDash
 
 ## Problem
 
