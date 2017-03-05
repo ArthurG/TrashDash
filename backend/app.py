@@ -86,11 +86,13 @@ def hello_world():
 
 @app.route('/<user_id>/spending_summary/', methods=['GET'])
 def spending(user_id):
+    user = User.query.filter(User.id==user_id).first()
     week_since = datetime.utcnow()-timedelta(hours = 7*24)
     month_since = datetime.utcnow()-timedelta(hours = 30 * 24)
     day_since = datetime.utcnow()-timedelta(hours = 1*24)
 
-    m = {"weekly": get_total_waste_since(user_id, week_since), "monthly": get_total_waste_since(user_id, month_since), "daily": get_total_waste_since(user_id, day_since)}
+    m = {"weekly": get_total_waste_since(user_id, week_since), "monthly": get_total_waste_since(user_id, month_since), "daily": get_total_waste_since(user_id, day_since), "name": user.fb_name}
+    
 
     spendingsPerDay = []
     for i in range(30):
