@@ -36,16 +36,16 @@ class DisposalTransaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     value = db.Column(db.Integer)
     itemname = db.Column(db.String(50))
-    category = db.Column(db.String(50)) #TODO: Process category of product instead of just name
+    category = db.Column(db.String(50)) 
     datetime = db.Column(db.DateTime)
     wishtopost = db.Column(db.Boolean)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     user = db.relationship('User', backref=db.backref('disposals', lazy='dynamic'))
-    def __init__(self, user, amount, itemname, category):
+    def __init__(self, user, amount, itemname):
         self.user = user
         self.value = amount
         self.datetime = datetime.utcnow()
-        self.category = category
+        self.category = utils.get_product_category(itemname)
         self.itemname = itemname
         self.wishtopost = False
 
@@ -56,7 +56,6 @@ class Friendship(db.Model):
     def __init__(self, follower, followed):
         self.user_follower_id = follower.id
         self.user_followed_id = followed.id
-
 
 clarifai = ClarifaiApp(keys.clarifai1, keys.clarifai2) 
 # get the general model
@@ -70,7 +69,7 @@ def hello_world():
 @app.route('/<user_id>/spending_summary/', methods=['GET'])
 def spending(user_id):
     week_since = datetime.utcnow()-timedelta(hours = 7*24)
-    month_since = datetime.utcnow()-timedelta(hours = 30*24)
+    month_since = datetime.utcnow()-timedelta(hours = 30 * 24)
     day_since = datetime.utcnow()-timedelta(hours = 1*24)
 
     m = {"weekly": get_total_waste_since(user_id, week_since), "monthly": get_total_waste_since(user_id, month_since), "daily": get_total_waste_since(user_id, day_since)}
@@ -189,6 +188,8 @@ def process_webhook():
                     elif messaging_event["message"].get("attachments", [])[0].get("type", "") == "image":
                         process_image(messaging_event)
                     #Process location requests TODO
+                    elif messaging_event["message"].get("attachments", [])[0].get("type", "") == "location":
+                        process_location(messaging_event)
                 except:
                     traceback.print_exc()
 
@@ -196,15 +197,15 @@ def process_webhook():
 
 #Temp stub until I get a real api 
 def get_price(product_type):
-    prices = {"laptop": 200, "iphone": 300, "phone": 200, "ipad": 300}
+    prices = {"laptop": 100, "iphone": 300, "phone": 150, "ipad": 300}
     return prices.get(product_type, 10)
 
 def get_food_price(product_type):
-    prices = {"banana": 1, "milk": 5, "cheese": 5, "orange": 1, "apple": 1, None: -1}
+    prices = {"banana": 1, "milk": 5, "cheese": 5, "orange": 1, "apple": 1, "peanut butter": 3,None: -1}
     return prices.get(product_type, 10)
 
 def get_food_type(concepts):
-    accepted_foods = ["banana", "orange", "apple", "milk", "cheese"]
+    accepted_foods = ["banana", "orange", "apple", "milk", "cheese", "peanut butter"]
     for concept in concepts:
         if concept["name"] in accepted_foods:
             return concept["name"]
@@ -213,7 +214,7 @@ def suggest_kijiji(messaging_event):
     return ""
 
 def save_trash_to_database(user, product_type, value):
-    product = DisposalTransaction(user, value, product_type, product_type)
+    product = DisposalTransaction(user, value, product_type)
     db.session.add(product)
     db.session.commit()
 
@@ -246,7 +247,6 @@ def process_image(messaging_event):
 def get_user_or_signup(messaging_event):
     user = User.query.filter_by(fb_id=messaging_event["sender"]["id"]).first()
     if user == None:
-        #TODO: get the user's facebook name too
         uid = messaging_event["sender"]["id"]
         name = utils.get_user_full_name(uid)
         user = User(uid, name)
@@ -287,11 +287,47 @@ def process_string_message(messaging_event):
         user.command_in_progress = "kijiji_username"
         db.session.commit()
         return
+    elif "looking to buy" in message:
+        msg = message.split("looking to buy")
+        category = utils.get_product_category(msg[-1].strip())
+        duration = datetime.utcnow() - timedelta(hours = 7 * 24)
+        relevant_trans = DisposalTransaction.query.filter(DisposalTransaction.user_id==user.id).filter(DisposalTransaction.category==category).filter(DisposalTransaction.datetime >= duration).all()
+        print(relevant_trans)
+        total_spending = sum([trans.value for trans in relevant_trans])
+        if total_spending >= 5:
+            reply = "You might want to reconsider that decision"
+        else:
+            reply = "You are probably fine buying that :)"
+        utils.send_message(user.fb_id, "You threw out ${} in the {} category last week. {}".format(total_spending, category, reply))
+
 
     #Retriving status Web UI links
     elif message == "Dashboard":
         utils.send_dashboard_link(user)
     #Branch for processing quick requests ie: summaryToday, etc
+
+def process_location(messaging_event):
+    user = get_user_or_signup(messaging_event)
+    coord = messaging_event["message"].get("attachments", [])[0]["payload"]["coordinates"]
+    lat = coord["lat"]
+    lng = coord["long"]
+    if (utils.is_near_store(lat, lng)):
+        after_time = datetime.utcnow() - timedelta(hours = 30 * 24)
+        transactions = DisposalTransaction.query.filter(DisposalTransaction.user_id==user.id).filter(DisposalTransaction.category!="electronics").filter(DisposalTransaction.datetime >=after_time).all()
+        cats = {}
+        for t in transactions:
+            print(t.category, cats.get(t.category,0)+t.value)
+            cats.update({t.category: cats.get(t.category, 0)+t.value}) 
+        catsList = sorted(cats.items(), key = lambda c: c[1], reverse=True)
+        top3Cats = catsList[:min(len(catsList), 3)]
+        utils.send_message(user.fb_id, "During the next grocery trip, consider your top three waste categories in your last month")
+        [utils.send_message(user.fb_id, "{}: ${}".format(c[0], c[1])) for c in top3Cats]
+
+
+        
+
+
+
 
 def process_wish_to_post(user):
     #if user.disposals[-1].wishtopost:

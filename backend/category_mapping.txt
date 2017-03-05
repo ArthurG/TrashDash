@@ -1,0 +1,240 @@
+milk,dairy
+cheese,dairy
+egg,dairy
+margarine,dairy
+egg nong,dairy
+sour cream,dairy
+tofo,dairy
+whip cream,dairy
+yogurt,dairy
+bagels,baked
+brownies,baked
+buns,baked
+cake,baked
+cheese bread,baked
+cookies,baked
+doughnuts,baked
+muffins,baked
+english muffins,baked
+french bread,baked
+pie,baked
+pita,baked
+bread,baked
+tortillas,baked
+asparagus,vegetable
+avocados,vegetable
+basil,vegetable
+beets,vegetable
+broccoli,vegetable
+brussels sprouts,vegetable
+cabbage,vegetable
+carrots,vegetable
+cauliflower,vegetable
+celery,vegetable
+chard,vegetable
+chives,vegetable
+cilanto,vegetable
+collards,vegetable
+corn,vegetable
+cucumbers,vegetable
+egg plant,vegetable
+endives,vegetable
+garlic,vegetable
+green peppers,vegetable
+kale,vegetable
+kohlrabi,vegetable
+lettuce,vegetable
+mushrooms,vegetable
+onions,vegetable
+oregano,vegetable
+parsley,vegetable
+parsnips,vegetable
+potatoes,vegetable
+pumpkin,vegetable
+radishes,vegetable
+red peppers,vegetable
+rutabagas,vegetable
+spinach,vegetable
+sprouts,vegetable
+squash,vegetable
+tomatoes,vegetable
+yams,vegetable
+yellow peppers,vegetable
+zucchini,vegetable
+apples,fruit
+apricots,fruit
+bananas,fruit
+blueberries,fruit
+cantaloupe,fruit
+cherries,fruit
+cranberries,fruit
+grape,fruit
+grapefruit,fruit
+honeydew,fruit
+kiwi,fruit
+kumquats,fruit
+limes,fruit
+lemons,fruit
+mangoes,fruit
+melon,fruit
+nectarines,fruit
+oranges,fruit
+papaya,fruit
+peaches,fruit
+pears,fruit
+pineapple,fruit
+plums,fruit
+raspberries,fruit
+strawberries,fruit
+clams,seafood
+cod,seafood
+crab,seafood
+flounder,seafood
+halibut,seafood
+lobster,seafood
+mussels,seafood
+oysters,seafood
+red snapper,seafood
+salmon,seafood
+shrimp,seafood
+tilapia,seafood
+tuna,seafood
+sword fish,seafood
+beans,frozen
+beef pot pie,frozen
+berries,frozen
+burger patties,frozen
+burritos,frozen
+carrots,frozen
+chicken,frozen
+chicken nuggets,frozen
+chicken pot pie,frozen
+chicken wings,frozen
+corn dogs,frozen
+fish sticks,frozen
+french fries,frozen
+ice cream,frozen
+juice concentrate,frozen
+mozzarella sticks,frozen
+onion rings,frozen
+pancakes,frozen
+pasta,frozen
+peas,frozen
+perogies,frozen
+pie,frozen
+pizza,frozen
+pizza snacks,frozen
+popsicles,frozen
+potato nuggets,frozen
+ready bake treats,frozen
+sorbet,frozen
+stir fry,frozen
+mixed vegetables,frozen
+taquitos,frozen
+tater tots,frozen
+turkey,frozen
+turkey pot pie,frozen
+tv dinners,frozen
+veggie burgers,frozen
+waffles,frozen
+bacon,meat
+bologna,meat
+chicken bologna,meat
+chicken breast,meat
+chicken legs,meat
+chicken loaf,meat
+chicken,meat
+corned beef,meat
+ground beef,meat
+ground pork,meat
+ham,meat
+hamburgers,meat
+hot dogs,meat
+liver,meat
+pizza,meat
+pork chops,meat
+roast beef,meat
+salami,meat
+sausage,meat
+pepperoni,meat
+steak,meat
+turkey,meat
+turkey breast,meat
+veggie dogs,meat
+veggie burgers,meat
+all spice,spice
+basil,spice
+bay leaf,spice
+cilantro,spice
+cinnamon,spice
+cloves,spice
+garlic,spice
+ginger,spice
+meat tenderizer,spice
+mint,spice
+montreal meat spice,spice
+oregano,spice
+paprika,spice
+parsley,spice
+pepper,spice
+salt,spice
+alfredo sauce,sauce
+apple sauce,sauce
+chili sauce,sauce
+bbq sauce,sauce
+gravy,sauce
+honey,sauce
+hot sauce,sauce
+hp sauce,sauce
+jam,sauce
+jelly,sauce
+ketchup,sauce
+marmalade,sauce
+mayonnaise,sauce
+meat sauce,sauce
+mustard,sauce
+nacho dip,sauce
+olives,sauce
+pasta sauce,sauce
+peanut butter,sauce
+pickles,sauce
+relish,sauce
+salad dressing,sauce
+salsa,sauce
+soy sauce,sauce
+steak sauce,sauce
+sweet & sour sauce,sauce
+syrup,sauce
+tartar sauce,sauce
+tomato paste,sauce
+tomato sauce,sauce
+worcestershire,sauce
+breath mints,snacks
+candy,snacks
+cheezies,snacks
+chips,snacks
+chips,snacks
+chocolate,snacks
+club soda,snacks
+corn chips,snacks
+dried fruit,snacks
+granola bars,snacks
+gum,snacks
+hickory sticks,snacks
+juice,snacks
+mineral water,snacks
+mixers,snacks
+nacho chips,snacks
+nuts,snacks
+peanuts,snacks
+pop,snacks
+popcorn,snacks
+pork rinds,snacks
+pretzels,snacks
+protein bars,snacks
+sport drink,snacks
+trail mix,snacks
+laptop,electronics
+phone,electronics
+iphone,electronics
+ipad,electronics

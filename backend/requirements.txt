@@ -1,0 +1,6 @@
+textblob
+flask
+flask-cors
+flask-sqlalchemy
+clarifai
+

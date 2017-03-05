@@ -14,12 +14,13 @@
 
 * Facebook bot should attempt to minimze amount of clicks required for must haves ( good UX )
 * Facebook bot should assist user in posting old trash to Kijiji if its value is high
-* Facebook bot should be able to show relevant trash history if user sends location which is near a store
+* ~~Facebook bot should be able to show relevant trash history if user sends location which is near a store~~
 * Web UI should be able to add friends on social network, and compete to minimize the amount of trash they dispose
 * ~~There should be a way to link Kijiji Accounts to your TrashWatch profile~~
 
 ### Nice to haves
 
+* ~~Facebook bot can tell you what you can and can't buy based on what you threw out~~
 * All web graphs through Web UI would be nice to have be customly styled
 * It would be nice to use eBay API to find product prices in backend
 * It would be nice if I didn't have to train my own own neural nets with Clarifai and products were labeled already for us

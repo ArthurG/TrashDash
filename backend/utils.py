@@ -2,6 +2,7 @@ import keys
 
 import requests
 import json
+from textblob import Word
 
 def send_dashboard_link(user):
     msg = {
@@ -76,3 +77,23 @@ def get_user_full_name(uid):
         print(r.text)
     return response["first_name"] + " " + response["last_name"]
 
+def get_product_category(name):
+    pl = Word(name).pluralize().lower()
+    f = open('category_mapping.txt', 'r')
+    for line in f:
+        if line.split(',')[0] == name or line.split(',')[0] == pl:
+            return line.split(',')[1].strip()
+    return name
+
+def is_near_store(lat, lng, category="store",keyword="grocery",radius=100):
+    endpoint = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    params = {
+            "location": "{},{}".format(lat, lng),
+            "radius": radius,
+            "type": category,
+            "key": keys.google_maps,
+            "keyword": keyword
+            }
+    r = requests.get(endpoint, params=params)
+    return len(r.json()["results"]) > 0
+    

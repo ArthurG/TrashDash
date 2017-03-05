@@ -92,3 +92,6 @@ ENV/
 .*swp
 
 frontend/node_modules/
+backend/test.db
+.gitignore
+*.swo
