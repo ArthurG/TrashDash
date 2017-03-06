@@ -53,10 +53,10 @@
       </div>
     </div><!--/.card-->
 
-    <div class="row">
-      <div class="col-md-6">
-        <div class="card">
-          <div class="card-header">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+           <div class="card-header">
             Waste by Category
           </div>
           <div class="card-block">
@@ -115,50 +115,49 @@ import { dropdown } from 'vue-strap'
 
 export default {
   name: 'dashboard',
-  data(){
+  data () {
     return {
       uid: 0,
       stats: {
         daily: 111,
         monthly: 222,
-        weekly: 333,
+        weekly: 333
       },
       chartData: null,
       pulledData: null,
-      datacollection:  {
+      datacollection: {
         labels: [1],
         datasets: [
-        {
-          label: 'Data One',
-          backgroundColor: '#f87979',
-          data: [1]
-        }, {
-          label: 'Data One',
-          backgroundColor: '#f87979',
-          data: [1]
-        }
+          {
+            label: 'Data One',
+            backgroundColor: '#f87979',
+            data: [1]
+          }, {
+            label: 'Data One',
+            backgroundColor: '#f87979',
+            data: [1]
+          }
         ]
       },
       pie_data: {
         labels: ['Lool', 'EmberJs', 'ReactJs', 'AngularJs', 'Vanilla'],
         datasets: [
-        {
-          backgroundColor: [
-            '#41B883',
-            '#E46651',
-            '#00D8FF',
-            '#DD1B16',
-            '#7B1fA2',
-            '#963BB8',
-            '#303f9f',
-            '689f38'
-          ],
-          data: [40, 20, 80, 10, 15]
-        }
+          {
+            backgroundColor: [
+              '#41B883',
+              '#E46651',
+              '#00D8FF',
+              '#DD1B16',
+              '#7B1fA2',
+              '#963BB8',
+              '#303f9f',
+              '689f38'
+            ],
+            data: [40, 20, 80, 10, 15]
+          }
         ]
       },
-      friend_data: [{name: "Fake person", mineIsGreater: true, spendings: 12}]
-      
+      friend_data: [{name: 'Fake person', mineIsGreater: true, spendings: 12}]
     }
   },
   components: {
@@ -172,72 +171,71 @@ export default {
     SocialBoxChartExample,
     dropdown
   },
-  mounted: function(){
+  mounted: function () {
     this.uid = this.$route.params.uid
     console.log(this.$route.params)
-    this.getData();
-  }, 
+    this.getData()
+  },
   methods: {
     getRandomInt () {
       return Math.floor(Math.random() * (50 - 5 + 1)) + 5
     },
- 
-    getData(){
-    //Get spending summary
-    this.$http.get(this.uid+'/spending_summary/').then(response => {
-      this.stats.monthly = response.body.monthly;
-    this.stats.daily = response.body.daily;
-    this.stats.weekly = response.body.weekly;
-    this.pulledData = response.body.per_day;
+    getData () {
+    // Get spending summary
+      this.$http.get(this.uid + '/spending_summary/').then(response => {
+        this.stats.monthly = response.body.monthly
+        this.stats.daily = response.body.daily
+        this.stats.weekly = response.body.weekly
+        this.pulledData = response.body.per_day
 
-    const brandInfo = '#63c2de'
-      this.datacollection = {
-        labels: response.body.days,
-        datasets: [
-        {
-          backgroundColor:brandInfo,
-          borderColor: brandInfo,
-          pointHoverBackgroundColor: '#fff',
-          borderWidth: 2,
-          data: response.body.per_day
+        const brandInfo = '#63c2de'
+        this.datacollection = {
+          labels: response.body.days,
+          datasets: [
+            {
+              backgroundColor: brandInfo,
+              borderColor: brandInfo,
+              pointHoverBackgroundColor: '#fff',
+              borderWidth: 2,
+              data: response.body.per_day
+            }
+          ]
         }
-        ]
-      }
-
-    }, response => {
-      console.log(response);
+      }, response => {
+        console.log(response)
       // error callback
-    });
+      })
 
-    //Get the spending categories
-    this.$http.get(this.uid+'/category/week').then(response => {
-      this.pie_data = {
-        labels: Object.keys(response.body),
-        datasets: [
-        {
-          backgroundColor: [
-            '#41B883',
-            '#E46651',
-            '#00D8FF',
-            '#DD1B16',
-            '#7B1fA2',
-            '#963BB8',
-            '#303f9f',
-            '689f38'
-          ],
-          data: Object.values(response.body)
+    // Get the spending categories
+      this.$http.get(this.uid + '/category/week').then(response => {
+        this.pie_data = {
+          labels: Object.keys(response.body),
+          datasets: [
+            {
+              backgroundColor: [
+                '#41B883',
+                '#E46651',
+                '#00D8FF',
+                '#DD1B16',
+                '#7B1fA2',
+                '#963BB8',
+                '#303f9f',
+                '689f38'
+              ],
+              data: Object.values(response.body)
+            }
+          ]
         }
-        ]
-      }
-    }, err => {});
-
-    //Get your friends data
-    this.$http.get(this.uid+'/friends').then(response => {
-      this.friend_data = response.body.friends
-    }, err => {});
-
-
-  }
+      }, err => {
+        console.log(err)
+      })
+      // Get your friends data
+      this.$http.get(this.uid + '/friends').then(response => {
+        this.friend_data = response.body.friends
+      }, err => {
+        console.log(err)
+      })
+    }
   }
 }
 </script>

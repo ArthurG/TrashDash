@@ -1,4 +1,7 @@
-#TrashDash
+# TrashDash
+
+###### I won the 2nd place hack at StartHacks 2017!!!! :D 
+###### [Hackerearth URL](https://www.hackerearth.com/sprints/start-hacks-1/dashboard/TrashWatch/submission/)
 
 ## Problem
 

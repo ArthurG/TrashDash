@@ -70,7 +70,7 @@ export default {
     navbar,
     dropdown
   },
-  created: function(e){
+  created: function (e) {
     document.body.classList.toggle('sidebar-hidden')
   },
   methods: {

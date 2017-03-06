@@ -1,8 +1,8 @@
 {
   "name": "core-ui",
   "version": "1.0.0",
-  "description": "TrashDash",
-  "author": "Arthur Guo <arthur.guo@uwaterloo.ca>",
+  "description": "Open Source Admin Template",
+  "author": "Łukasz Holeczek <lukasz@holeczek.pl>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
@@ -15,7 +15,6 @@
   "dependencies": {
     "vue": "^2.1.10",
     "vue-chartjs": "^2.3.7",
-    "vue-resource": "^1.2.1",
     "vue-router": "^2.2.0",
     "vue-strap": "github:wffranco/vue-strap"
   },

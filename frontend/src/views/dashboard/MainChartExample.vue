@@ -3,10 +3,11 @@ import { Line, mixins } from 'vue-chartjs'
 const { reactiveProp } = mixins
 
 // const brandPrimary = '#20a8d8'
-const brandSuccess = '#4dbd74'
-const brandInfo = '#63c2de'
-const brandDanger = '#f86c6b'
+// const brandSuccess = '#4dbd74'
+// const brandInfo = '#63c2de'
+// const brandDanger = '#f86c6b'
 
+/*
 function convertHex (hex, opacity) {
   hex = hex.replace('#', '')
   const r = parseInt(hex.substring(0, 2), 16)
@@ -20,6 +21,7 @@ function convertHex (hex, opacity) {
 function random (min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min)
 }
+*/
 
 export default Line.extend({
   mixins: [reactiveProp],
